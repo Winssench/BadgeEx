@@ -1,11 +1,16 @@
-"""
-Author: Omar CHICHAOUI
-Date: September 24, 2023
-Description: This is a Python script to verify badges.
-"""
 from PIL import Image, ImageDraw
 import numpy as np
 
+"""
+Author: Omar CHICHAOUI
+email: omar.chichaoui@gmail.com
+Date: September 24, 2023
+"""
+
+"""
+This module provides  the additional part needed in this exercice which is 
+to create a parallel function that converts the given image (of any format) into the specified object
+"""
 
 def create_mask(shape, size):
     # Create a mask image based on the specified shape
