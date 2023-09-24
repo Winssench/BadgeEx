@@ -4,6 +4,14 @@ Date: September 24, 2023
 Description: This is a Python script to verify badges.
 """
 from PIL import Image, ImageDraw
+import numpy as np
+
+
+
+def is_pastel_color(rgb):
+    # Check if the RGB color is within the pastel range
+    r, g, b = rgb
+    return r >= 200 and g >= 200 and b >= 200
 
 def verify_badge(image_path):
     """
@@ -28,27 +36,42 @@ def verify_badge(image_path):
 
     try:
         # Open the image
-        img = Image.open(image_path)
+        with Image.open(image_path) as img:
+        
+            # Verify size (512x512)
+            if img.size != (512, 512):
+                return "Image size is not 512x512"
 
-        # Verify size (512x512)
-        if img.size != (512, 512):
-            return "Image size is not 512x512"
+            # Create a mask for the circular region
 
+            mask = Image.new('L', img.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0, 512, 512), fill=255)
+            mask.save("sakoch.png")
 
-        # Check if the non-transparent pixels are within a circle
-   
+            # Check if there are any non-transparent pixels outside the circle on the original image
+            for x in range(512):
+                for y in range(512):
+                    pixel = img.getpixel((x, y))
+                    alpha = pixel[3]
+                    if alpha != 0 and mask.getpixel((x, y)) == 0:
+                        return "Non-transparent pixels are not within a circle"
+                    if alpha != 0 and not is_pastel_color(pixel[:3]):
+                        return "Colors are not pastel"
 
-        # Color analysis (define your criteria for "happy" colors)
-        # You can use the Image.getpixel() method to analyze individual pixels
+            return "Badge is valid"
 
-        return "Badge is valid"
 
     except Exception as e:
         return f"Error: {str(e)}"
+    
 
 
-
-invalid_image = 'invalid_badge.png'
+invalid_image = 'violation4.png'
+#invalid_image = 'valid.png'
 # Verify an invalid badge image
 result_invalid = verify_badge(invalid_image)
 print(f"Verification result for {invalid_image}: {result_invalid}")
+
+
+
